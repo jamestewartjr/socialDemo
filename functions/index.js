@@ -1,9 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const express = require('express')
+const app = require('express')();
+const firebase = require('firebase');
 
-
-const app = express();
 admin.initializeApp();
 
 app.get('/comments', (request, response) => {
