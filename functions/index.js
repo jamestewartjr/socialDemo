@@ -3,6 +3,8 @@ const admin = require('firebase-admin');
 const app = require('express')();
 const firebase = require('firebase');
 
+admin.initializeApp(functions.config().firebase);
+
 const firebaseConfig = {
   apiKey: "AIzaSyAt9i5XiZyom2mXsOSpLfd_0ILgDZ6uLhM",
   authDomain: "socialdemospa.firebaseapp.com",
@@ -14,10 +16,9 @@ const firebaseConfig = {
   measurementId: "G-17M8KBTB0B"
 };
 
-const db = admin.firestore();
-
-admin.initializeApp();
 firebase.initializeApp(firebaseConfig);
+
+const db = admin.firestore();
 
 app.get('/comments', (request, response) => {
   db
@@ -46,8 +47,7 @@ app.post('/comments', ( request, response) => {
     createdAt: new Date().toISOString()
   };
 
-  db  
-    .collection('comments')
+  db.collection('comments')
     .add(newComments)
     .then(doc => {return response.json({ message: `document ${doc.id} created successfully`})})
     .catch(error => {
@@ -64,6 +64,8 @@ app.post('/signup', (request, response) => {
     userName: request.body.userName
   };
 
+  let tokenValue,userId;
+
   db.doc(`/users/${newUser.userName}`).get()
     .then(doc => {
       if(doc.exists){
@@ -73,15 +75,33 @@ app.post('/signup', (request, response) => {
         return firebase.auth().createUserWithEmailAndPassword(newUser.email, newUser.password)
       }
     })
-    .then( data => {
-      return data.user.getIdToken();
-    })
-    .then( token => {
-      return response.status(201).json({token});
+    // .catch(error => {
+    //   console.error(error)
+    //   return response.status(500).json({error: error})
+    // })
+    // .then( data => {
+    //   // userId = data.user.uid;
+    //   return data.user.getIdToken();
+    // })
+    .then( (token) => {
+      tokenValue = token;
+      const userCredentials = {
+        email: newUser.email,
+        password: newUser.password,
+        confirmPass: newUser.confirmPass,
+        userName: newUser.userName,
+        createdAt: new Date().toISOString()
+      };
+      response.status(201).json({tokenValue})
+      return db.doc(`/users/${newUser.userName}`).set(userCredentials);
     })
     .catch(error => {
       console.error(error)
-      return response.status(500).json({error: error.code})
+      if(error.code === 'auth/email-already-in-use'){
+        return response.status(400).json({ email: 'Email is already in use.'})
+      }else {
+        return response.status(500).json({error: error})
+      }
     });
 
    
