@@ -50,10 +50,39 @@ app.get('/comments', (request, response) => {
     .catch((error)=> console.error(error));
 })
 
-app.post('/comments', ( request, response) => {
+const baseAuth = (request, response, next) => {
+  let idToken;
+  if(request.headers.authorization && request.headers.authorization.startsWith('Bearer ')){
+    idToken = request.headers.authorization.split('Bearer ')[1];
+  } else {
+    console.error('No token found.')
+    return response.status(403).json({ error: 'Unauthorized'});
+  }
+
+  admin.auth().verifyIdToken(idToken)
+    .then(decodedToken => {
+      request.user = decodedToken;
+      return db.collection('users')
+        .where('userId', '==', request.user.uid)
+        .limit(1)
+        .get();
+    })
+    .then( data => {
+      request.user.userName = data.docs[0]
+        .data().userName
+        return next()
+    })
+    .catch((error) => {
+      console.error('verify token error', error)
+      return response.status(403).json(error);
+    });
+
+};
+
+app.post('/comments', baseAuth, (request, response) => {
   const newComments = {
     body: request.body.body,
-    userName: request.body.userName,
+    userName: request.user.userName,
     createdAt: new Date().toISOString()
   };
 
@@ -61,8 +90,8 @@ app.post('/comments', ( request, response) => {
     .add(newComments)
     .then(doc => {return response.json({ message: `document ${doc.id} created successfully`})})
     .catch(error => {
-      response.status(500).json({error: 'Something went wrong. Bad Response'})
-      return console.error(error)
+      console.error(error)
+      return response.status(500).json({error: 'Something went wrong. Bad Response'})
     })
 })
 
@@ -138,7 +167,7 @@ app.post('/signup', (request, response) => {
 });
 
 app.post('/login', (request, response) => {
-  const user = {
+  const newUser = {
     email: request.body.email,
     password: request.body.password,
   };
@@ -155,10 +184,10 @@ app.post('/login', (request, response) => {
     errors.password = 'Must not be empty.'
   } 
 
-  if(Object.keys(error).length > 0) return response.status(400).json(errors);
+  if(Object.keys(errors).length > 0) return response.status(400).json(errors);
 
   firebase.auth()
-    .signInWithEmailAndPassword(user.email, user.password)
+    .signInWithEmailAndPassword(newUser.email, newUser.password)
     .then(data => {
       return data.user.getIdToken();
     })
