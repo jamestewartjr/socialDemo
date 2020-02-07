@@ -4,7 +4,7 @@ const firebaseConfig = require('../util/config');
 const firebase = require('firebase');
 firebase.initializeApp(firebaseConfig);
 
-const {validateSignup, validateLogin} = require('../util/validators');
+const {validateSignup, validateLogin, reduceUserDetails} = require('../util/validators');
 
 const login = (request, response) => {
   const user = {
@@ -142,7 +142,20 @@ const uploadImage = (request, response) => {
   busBoy.end(request.rawBody);
 };
 
+const addUserDetails = (request, response) => {
+  let userDetails = reduceUserDetails(request.body);
+
+  // db.doc(`/users/${request.user.userName}`).update(userDetails)
+  db.doc(`/users/user5`).update(userDetails)
+    .then(() => {
+      return response.json( {message: 'Details updated successfully.'});
+    })
+    .catch((error) => {
+      return response.status(500).json({error}) 
+    })
+};
 module.exports = {
+  addUserDetails,
   login,
   signup,
   uploadImage
