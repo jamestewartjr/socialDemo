@@ -18,12 +18,13 @@ exports.firebaseAuth = (request, response, next) => {
         .get();
     })
     .then( data => {
+      console.info('auth data: ', data)
       request.user.userName = data.docs[0].data().userName;
       request.user.imageUrl = data.docs[0].data().imageUrl;
       return next();
     })
     .catch((error) => {
       console.error('verify token error', error)
-      return response.status(403).json(error);
+      return response.status(403).json({ error:error });
     });
 };

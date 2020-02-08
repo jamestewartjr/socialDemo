@@ -19,8 +19,7 @@ const getAllComments = (request, response) => {
     })
     .catch((error)=> console.error(error));
 };
-
-exports.postComment = (request, response) => {
+const postComment = (request, response) => {
   const newComments = {
     body: request.body.body,
     userName: request.user.userName,
@@ -38,4 +37,5 @@ exports.postComment = (request, response) => {
 
 module.exports = {
   getAllComments,
+  postComment
 }

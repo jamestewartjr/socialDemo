@@ -151,7 +151,7 @@ const addUserDetails = (request, response) => {
       return response.json( {message: 'Details updated successfully.'});
     })
     .catch((error) => {
-      return response.status(500).json({error}) 
+      return response.status(500).json({error:error}) 
     })
 };
 module.exports = {
