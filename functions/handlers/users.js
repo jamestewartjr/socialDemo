@@ -153,9 +153,34 @@ const addUserDetails = (request, response) => {
     })
 };
 
+const getRegisteredUser = (request, response) => {
+  let userData = {};
+  db.doc(`/users/${request.user.userName}`).get()
+    .then(doc => {
+      if(doc.exists){
+        userData.credentials = doc.data();
+        return db.collection('likes')
+          .where('userName', '==', request.user.userName)
+          .get()  
+      }
+    })
+    .then(data => {
+      userData.likes = [];
+      data.forEach(doc => {
+        userData.likes.push(doc.data());
+      });
+      return response.json(userData);
+    })
+    .catch(error => {
+      console.log("Error",error);
+      return response.status(500).json({"Error": Error.code})
+    })
+};
+
 module.exports = {
   addUserDetails,
   login,
   signup,
-  uploadImage
+  uploadImage,
+  getRegisteredUser 
 }

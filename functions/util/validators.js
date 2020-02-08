@@ -43,7 +43,6 @@ const validateSignup = (data) => {
 
 const reduceUserDetails = (data) => {
   let userDetails = {};
-console.log('reduce data',data)
   if(!isEmpty(data.bio.trim())) userDetails.bio = data.bio;
   if(!isEmpty(data.website.trim())){
     if(data.website.trim().substring(0, 4) !== 'http'){
