@@ -17,7 +17,7 @@ const getAllComments = (request, response) => {
       })
       return response.json(comments);
     })
-    .catch((error)=> console.error(error));
+    .catch((error)=> console.error('Error: ', error));
 };
 const postComment = (request, response) => {
   const newComments = {
@@ -30,7 +30,7 @@ const postComment = (request, response) => {
     .add(newComments)
     .then(doc => {return response.json({ message: `document ${doc.id} created successfully`})})
     .catch(error => {
-      console.error(error)
+      console.error('error: ',error)
       return response.status(500).json({error: 'Something went wrong. Bad Response'})
     })
 };

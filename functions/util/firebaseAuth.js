@@ -1,12 +1,11 @@
 const {admin, db} = require('./admin');
-console.log()
 
 exports.firebaseAuth = (request, response, next) => {
   let idToken;
   if(request.headers.authorization && request.headers.authorization.startsWith('Bearer ')){
     idToken = request.headers.authorization.split('Bearer ')[1];
   } else {
-    console.error('No token found.')
+    console.error('No token found.', error)
     return response.status(403).json({ error: 'Unauthorized'});
   }
   admin.auth().verifyIdToken(idToken)
@@ -18,7 +17,6 @@ exports.firebaseAuth = (request, response, next) => {
         .get();
     })
     .then( data => {
-      console.info('auth data: ', data)
       request.user.userName = data.docs[0].data().userName;
       request.user.imageUrl = data.docs[0].data().imageUrl;
       return next();

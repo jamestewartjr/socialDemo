@@ -25,7 +25,7 @@ const login = (request, response) => {
       return response.json({token})
     })
     .catch(error => {
-      console.error(error);
+      console.error('Error: ',error);
       if(error.code === 'auth/wrong-password'){
         return response.status(403).json({general: 'Wrong credentials.'});
 
@@ -45,7 +45,6 @@ const signup = (request, response) => {
 
   if(!valid) return response.status(400).json(errors);
 
-
   let tokenValue,userId;
 
   return db.doc(`/users/${newUser.userName}`).get()
@@ -58,7 +57,7 @@ const signup = (request, response) => {
       }
     })
     .catch(error => {
-      console.error(error)
+      console.error('Error: ', error)
       return response.status(500).json({error: error})
     })
     .then( data => {
@@ -74,7 +73,7 @@ const signup = (request, response) => {
         userName: newUser.userName,
         createdAt: new Date().toISOString(),
         imageUrl:  `https://firebasestorage.googleapis.com/v0/b/${
-          conifig.storageBucket
+          firebaseConfig.storageBucket
         }/0/new-user-image/?alt=media`,
         userId
       };
@@ -82,7 +81,7 @@ const signup = (request, response) => {
       return db.doc(`/users/${newUser.userName}`).set(userCredentials);
     })
     .catch(error => {
-      console.error(error)
+      console.error('Error: ', error)
       if(error.code === 'auth/email-already-in-use'){
         return response.status(400).json({ email: 'Email is already in use.'})
       }else {
@@ -135,7 +134,7 @@ const uploadImage = (request, response) => {
       return response.json({ message: 'Image uploaded successfully.'})
     })
     .catch( error => {
-      console.log(error)
+      console.error('Error: ',error)
       return response.status(500).json({error:`Image upload failure: ${error}`})
     })
   })
@@ -145,8 +144,7 @@ const uploadImage = (request, response) => {
 const addUserDetails = (request, response) => {
   let userDetails = reduceUserDetails(request.body);
 
-  // db.doc(`/users/${request.user.userName}`).update(userDetails)
-  db.doc(`/users/user5`).update(userDetails)
+  db.doc(`/users/${request.user.userName}`).update(userDetails)
     .then(() => {
       return response.json( {message: 'Details updated successfully.'});
     })
@@ -154,6 +152,7 @@ const addUserDetails = (request, response) => {
       return response.status(500).json({error:error}) 
     })
 };
+
 module.exports = {
   addUserDetails,
   login,
