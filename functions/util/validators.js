@@ -26,14 +26,14 @@ const validateLogin = (data) => {
 const validateSignup = (data) => {
   let errors = {};
 
-  if(isEmpty(newUser.email)){ errors.email = 'Must not be empty.'}
-  else if (!isEmail(newUser.email)) { errors.email = 'Must be a valid email address.'}
+  if(isEmpty(data.email)){ errors.email = 'Must not be empty.'}
+  else if (!isEmail(data.email)) { errors.email = 'Must be a valid email address.'}
 
-  if(isEmpty(newUser.password)){ errors.password = 'Must not be empty.'} 
+  if(isEmpty(data.password)){ errors.password = 'Must not be empty.'} 
 
-  if(isEmpty(newUser.userName)){ errors.userName = 'Must not be empty.' } 
+  if(isEmpty(data.userName)){ errors.userName = 'Must not be empty.' } 
 
-  if(newUser.password !== newUser.confirmPass){ errors.confirmPass = 'Passwords must match'} 
+  if(data.password !== data.confirmPass){ errors.confirmPass = 'Passwords must match'} 
 
   return {
     errors, 
@@ -41,7 +41,21 @@ const validateSignup = (data) => {
   }
 }
 
+const reduceUserDetails = (data) => {
+  let userDetails = {};
+  if(!isEmpty(data.bio.trim())) userDetails.bio = data.bio;
+  if(!isEmpty(data.website.trim())){
+    if(data.website.trim().substring(0, 4) !== 'http'){
+      userDetails.website = `http://${data.website.trim()}`;
+    } 
+    else userDetails.website = data.website; 
+  }
+  if(!isEmpty(data.location.trim())) userDetails.location = data.location;
+  return userDetails;
+}
+
 module.exports = {
+  reduceUserDetails,
   validateLogin,
   validateSignup
 }

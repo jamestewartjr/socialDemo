@@ -17,10 +17,9 @@ const getAllComments = (request, response) => {
       })
       return response.json(comments);
     })
-    .catch((error)=> console.error(error));
+    .catch((error)=> console.error('Error: ', error));
 };
-
-exports.postComment = (request, response) => {
+const postComment = (request, response) => {
   const newComments = {
     body: request.body.body,
     userName: request.user.userName,
@@ -31,11 +30,12 @@ exports.postComment = (request, response) => {
     .add(newComments)
     .then(doc => {return response.json({ message: `document ${doc.id} created successfully`})})
     .catch(error => {
-      console.error(error)
+      console.error('error: ',error)
       return response.status(500).json({error: 'Something went wrong. Bad Response'})
     })
 };
 
 module.exports = {
   getAllComments,
+  postComment
 }
