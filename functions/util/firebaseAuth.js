@@ -5,7 +5,7 @@ exports.firebaseAuth = (request, response, next) => {
   if(request.headers.authorization && request.headers.authorization.startsWith('Bearer ')){
     idToken = request.headers.authorization.split('Bearer ')[1];
   } else {
-    console.error('No token found.', error)
+    console.error('No token found.')
     return response.status(403).json({ error: 'Unauthorized'});
   }
   admin.auth().verifyIdToken(idToken)
