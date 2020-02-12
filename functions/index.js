@@ -2,11 +2,31 @@ const functions = require('firebase-functions');
 const app = require('express')();
 
 const {firebaseAuth} = require('./util/firebaseAuth')
-const {getAllComments, postComment} = require('./handlers/comments')
-const {login, signup, uploadImage, addUserDetails, getRegisteredUser} = require('./handlers/users');
+const {
+  addPost, 
+  commentOnPost, 
+  deletePost,
+  getAllPosts, 
+  getPost,
+  likePost,
+  unlikePost
+} = require('./handlers/posts')
+const {
+  login, 
+  signup, 
+  uploadImage, 
+  addUserDetails, 
+  getRegisteredUser
+} = require('./handlers/users');
 
-app.get('/comments', getAllComments);
-app.post('/comments', firebaseAuth, postComment);
+app.get('/posts', getAllPosts);
+app.post('/posts', firebaseAuth, addPost);
+app.get('/post/:postId', getPost);
+app.post('/post/:postId/comment', firebaseAuth, commentOnPost);
+app.delete('/post/:postId', firebaseAuth, deletePost);
+app.get('/post/:postId/like', firebaseAuth, likePost);
+app.get('/post/:postId/unlike', firebaseAuth, unlikePost);
+
 
 app.post('/signup', signup);
 app.post('/login', login);
