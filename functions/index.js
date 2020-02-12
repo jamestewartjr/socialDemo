@@ -2,11 +2,18 @@ const functions = require('firebase-functions');
 const app = require('express')();
 
 const {firebaseAuth} = require('./util/firebaseAuth')
-const {getAllComments, postComment} = require('./handlers/comments')
+const {getAllPosts, addPost, getPost} = require('./handlers/posts')
 const {login, signup, uploadImage, addUserDetails, getRegisteredUser} = require('./handlers/users');
 
-app.get('/comments', getAllComments);
-app.post('/comments', firebaseAuth, postComment);
+app.get('/posts', getAllPosts);
+app.post('/posts', firebaseAuth, addPost);
+app.get('/post/:postId', getPost);
+
+// TODO: delete post
+// TODO: like a post
+// TODO: unlike a post
+// TODO: post on post 
+
 
 app.post('/signup', signup);
 app.post('/login', login);
