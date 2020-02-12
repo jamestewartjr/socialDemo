@@ -7,7 +7,9 @@ const {
   commentOnPost, 
   deletePost,
   getAllPosts, 
-  getPost
+  getPost,
+  likePost,
+  unlikePost
 } = require('./handlers/posts')
 const {
   login, 
@@ -22,8 +24,8 @@ app.post('/posts', firebaseAuth, addPost);
 app.get('/post/:postId', getPost);
 app.post('/post/:postId/comment', firebaseAuth, commentOnPost);
 app.delete('/post/:postId', firebaseAuth, deletePost);
-// app.get('/post/:postId/like', firebaseAuth, likePost);
-// app.get('/post/:postId/unlike', firebaseAuth, unlikePost);
+app.get('/post/:postId/like', firebaseAuth, likePost);
+app.get('/post/:postId/unlike', firebaseAuth, unlikePost);
 
 
 app.post('/signup', signup);
