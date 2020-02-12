@@ -65,8 +65,62 @@ const getPost = (request, response) => {
 
 }
 
+const commentOnPost = (request, response) => {
+  if (request.body.body.trim() === '') response.status(400).json({ comment: 'Must not be empty' });
+  const newComment = {
+    body: request.body.body,
+    createdAt: new Date().toISOString(),
+    postId: request.params.postId,
+    userName: request.user.userName,
+    userImage: request.user.imageUrl
+  };
+  db.doc(`/posts/${request.params.postId}`)
+  .get()
+  .then((doc) => {
+    if (!doc.exists) {
+      return response.status(404).json({ error: 'Post not found' });
+    }
+    return doc.ref.update({ commentCount: doc.data().commentCount + 1 });
+  })
+  .then(() => {
+    return db.collection('comments').add(newComment);
+  })
+  .then(() => {
+    return response.json(newComment);
+  })
+  .catch((error) => {
+    console.log(error);
+    response.status(500).json({ error: 'Something went wrong' });
+  });
+}
+
+  const deletePost = (request, response) => {
+  const document = db.doc(`/posts/${request.params.postId}`);
+  document
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        return response.status(404).json({ error: 'Post not found' });
+      }
+      if (doc.data().userName !== request.user.userName) {
+        return response.status(403).json({ error: 'Unauthorized' });
+      } else {
+        return document.delete();
+      }
+    })
+    .then(() => {
+      return response.json({ message: 'Post deleted successfully' });
+    })
+    .catch((error) => {
+      console.error(error);
+      return response.status(500).json({ error: error.code });
+    });
+};
+
 module.exports = {
   addPost,
+  commentOnPost,
+  deletePost,
   getAllPosts,
   getPost
 }
