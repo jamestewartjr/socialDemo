@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const app = require('express')();
+const {db} = require('./util/admin');
 
 const {firebaseAuth} = require('./util/firebaseAuth')
 const {
@@ -35,3 +36,64 @@ app.post('/user/',  firebaseAuth, addUserDetails)
 app.get('/user/',  firebaseAuth, getRegisteredUser)
 
 exports.api = functions.https.onRequest(app);
+
+exports.sendNotificationOnLike = functions.firestore.document('likes/{id}')
+  .onCreate((snapshot) => {
+    db.doc(`/posts/${snapshot.data().postId}`).get()
+      .then(doc => {
+        if(doc.exists){
+          return db.doc(`/notifications/${snapshot.id}`).set({
+            createdAt: new Date().toISOString(),
+            receipient: doc.data().userName,
+            sender: snapshot.data().userName,
+            type: 'like',
+            read: false,
+            postId: doc.id
+          });
+        }
+        return;
+      })
+      .catch( error => {
+        console.error({ error: error})
+        return;
+      })
+  })
+
+  exports.deleteNotificationOnUnLike = functions
+  .firestore.document('likes/{id}')
+  .onDelete((snapshot) => {
+    return db
+      .doc(`/notifications/${snapshot.id}`)
+      .delete()
+      .catch((err) => {
+        console.error(err);
+        return;
+      });
+  });
+
+  exports.sendNotificationOnComment = functions
+  .firestore.document('comments/{id}')
+  .onCreate((snapshot) => {
+    return db
+      .doc(`/posts/${snapshot.data().postId}`)
+      .get()
+      .then((doc) => {
+        if (
+          doc.exists &&
+          doc.data().userName !== snapshot.data().userName
+        ) {
+          return db.doc(`/notifications/${snapshot.id}`).set({
+            createdAt: new Date().toISOString(),
+            recipient: doc.data().userName,
+            sender: snapshot.data().userName,
+            type: 'comment',
+            read: false,
+            postId: doc.id
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        return;
+      });
+  });
