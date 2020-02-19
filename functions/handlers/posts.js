@@ -12,7 +12,10 @@ const getAllPosts = (request, response) => {
           postId: doc.id,
           body: doc.data().body,
           userName: doc.data().userName,
-          createdAt: doc.data().createdAt
+          createdAt: doc.data().createdAt,
+          commentCount: doc.data().commentCount,
+          likeCount: doc.data().likeCount,
+          userImage: doc.data().userImage,
         });
       })
       return response.json(posts);
