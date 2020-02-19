@@ -17,7 +17,6 @@ exports.firebaseAuth = (request, response, next) => {
         .get();
     })
     .then( data => {
-      console.log('auth userName', data.docs[0].data().userName )
       request.user.userName = data.docs[0].data().userName;
       request.user.imageUrl = data.docs[0].data().imageUrl;
       return next();

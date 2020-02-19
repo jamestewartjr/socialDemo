@@ -63,7 +63,6 @@ const getPost = (request, response) => {
       .then( data => { 
         postData.comments = []
         data.forEach((doc) => {
-          console.log('doc2push: ', doc)
           postData.comments.push(doc.data());
         })
       return response.json(postData);
@@ -99,7 +98,7 @@ const commentOnPost = (request, response) => {
     return response.json(newComment);
   })
   .catch((error) => {
-    console.log(error);
+    console.error(error);
     response.status(500).json({ error: 'Something went wrong' });
   });
 }

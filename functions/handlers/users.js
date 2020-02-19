@@ -187,7 +187,7 @@ const getRegisteredUser = (request, response) => {
       return response.json(userData);
     })
     .catch(error => {
-      console.log("Error",error);
+      console.error("Error ",error);
       return response.status(500).json({"Error": Error.code})
     })
 };
