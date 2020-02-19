@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
-import Home from './pages/home.js';
+import {Home, Login, Signup} from './pages/index.js';
 
 class App extends Component {
   render() {
@@ -10,17 +10,14 @@ class App extends Component {
       <div className="App"> 
       <Router>
         <Switch>
-          <Route path="/" component={Home} />
-          {/* <Route path="/" component={home} />
-          <Route path="/" component={home} /> */}
-
+          <Route exact path="/" component={Home} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/signup" component={Signup} />
         </Switch>
       </Router>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
       </header>
-        <h1>Home</h1>
-
       </div>
     )
   }

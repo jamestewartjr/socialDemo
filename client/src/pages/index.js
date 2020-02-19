@@ -1,5 +1,10 @@
 import Home from './home';
+import Login from './login';
+import Signup from './signup';
 
-export default {
-  Home
+
+export {
+  Home,
+  Login,
+  Signup
 };
