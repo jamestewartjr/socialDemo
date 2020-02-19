@@ -43,7 +43,7 @@ exports.api = functions.https.onRequest(app);
 exports.sendNotificationOnLike = functions
   .firestore.document('likes/{id}')
     .onCreate((snapshot) => {
-    db.doc(`/posts/${snapshot.data().postId}`).get()
+    return db.doc(`/posts/${snapshot.data().postId}`).get()
       .then(doc => {
         if(doc.exists){
           return db.doc(`/notifications/${snapshot.id}`).set({
@@ -59,7 +59,6 @@ exports.sendNotificationOnLike = functions
       })
       .catch( error => {
         console.error({ error: error})
-        return;
       })
   })
 
@@ -71,7 +70,6 @@ exports.sendNotificationOnLike = functions
       .delete()
       .catch((err) => {
         console.error(err);
-        return;
       });
   });
 
@@ -98,6 +96,5 @@ exports.sendNotificationOnLike = functions
       })
       .catch((err) => {
         console.error(err);
-        return;
       });
   });
