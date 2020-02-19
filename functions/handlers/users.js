@@ -195,10 +195,63 @@ const getRegisteredUser = (request, response) => {
     })
 };
 
+const getUserDetails = (request, response) => {
+  let userData = {};
+  db.doc(`/users/${request.params.userName}`).get()
+    .then( doc => {
+      if(doc.exists){
+        userData.user = doc.data();
+        return db.collection('posts')
+          .where('userName', '==', request.params.userName)
+          .orderBy('createdAt','desc')
+          .get();
+      } else {
+        return response.status(404).json({error:"User Not found"})
+      }
+    })
+    .then( data => {
+      userData.posts = [];
+      data.forEach( doc => {
+        userData.posts.push({
+          body: doc.data().body,
+          createdAt: doc.data().createdAt,
+          userName: doc.data().userName,
+          userImage: doc.data().userImage,
+          likeCount: doc.data().likeCount,
+          commentCount: doc.data().commentCount,
+          postId: doc.id,
+        })
+      })
+      return response.json(userData);
+    })
+    .catch( error => {
+      console.error(error);
+      return response.status(500).json({error: error});
+    })
+}
+
+const markNotificationsRead = (request, response) => {
+  let batch = db.batch();
+  request.body.forEach( notificationId => {
+    const notification = db.doc(`/notifications/${notificationId}`);
+    batch.update(notification, {read: true});
+  });
+  batch.commit()
+    .then( ()=>{
+      return response.json({ message: 'Notifications read'});
+    })
+    .catch( error => {
+      console.error(error);
+      return response.status(500).json({error: error});
+    })
+}
+
 module.exports = {
   addUserDetails,
+  getRegisteredUser,
+  getUserDetails,
   login,
+  markNotificationsRead,
   signup,
   uploadImage,
-  getRegisteredUser 
 }

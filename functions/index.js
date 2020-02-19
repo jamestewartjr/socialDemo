@@ -13,11 +13,13 @@ const {
   unlikePost
 } = require('./handlers/posts')
 const {
+  addUserDetails, 
+  getRegisteredUser,
+  getUserDetails,
   login, 
+  markNotificationsRead,
   signup, 
   uploadImage, 
-  addUserDetails, 
-  getRegisteredUser
 } = require('./handlers/users');
 
 app.get('/posts', getAllPosts);
@@ -28,17 +30,19 @@ app.delete('/post/:postId', firebaseAuth, deletePost);
 app.get('/post/:postId/like', firebaseAuth, likePost);
 app.get('/post/:postId/unlike', firebaseAuth, unlikePost);
 
-
 app.post('/signup', signup);
 app.post('/login', login);
-app.post('/user/image', firebaseAuth, uploadImage)
-app.post('/user/',  firebaseAuth, addUserDetails)
-app.get('/user/',  firebaseAuth, getRegisteredUser)
+app.post('/user/image', firebaseAuth, uploadImage);
+app.post('/user/',  firebaseAuth, addUserDetails);
+app.get('/user/',  firebaseAuth, getRegisteredUser);
+app.get('/user/:userName', getUserDetails);
+app.post('/notifications', firebaseAuth, markNotificationsRead);
 
 exports.api = functions.https.onRequest(app);
 
-exports.sendNotificationOnLike = functions.firestore.document('likes/{id}')
-  .onCreate((snapshot) => {
+exports.sendNotificationOnLike = functions
+  .firestore.document('likes/{id}')
+    .onCreate((snapshot) => {
     db.doc(`/posts/${snapshot.data().postId}`).get()
       .then(doc => {
         if(doc.exists){
@@ -61,7 +65,7 @@ exports.sendNotificationOnLike = functions.firestore.document('likes/{id}')
 
   exports.deleteNotificationOnUnLike = functions
   .firestore.document('likes/{id}')
-  .onDelete((snapshot) => {
+    .onDelete((snapshot) => {
     return db
       .doc(`/notifications/${snapshot.id}`)
       .delete()
@@ -73,7 +77,7 @@ exports.sendNotificationOnLike = functions.firestore.document('likes/{id}')
 
   exports.sendNotificationOnComment = functions
   .firestore.document('comments/{id}')
-  .onCreate((snapshot) => {
+    .onCreate((snapshot) => {
     return db
       .doc(`/posts/${snapshot.data().postId}`)
       .get()
