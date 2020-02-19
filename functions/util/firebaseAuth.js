@@ -23,6 +23,6 @@ exports.firebaseAuth = (request, response, next) => {
     })
     .catch((error) => {
       console.error('verify token error', error)
-      return response.status(403).json({ error:error });
+      return response.status(403).json({ error: error });
     });
 };

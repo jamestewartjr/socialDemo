@@ -12,7 +12,10 @@ const getAllPosts = (request, response) => {
           postId: doc.id,
           body: doc.data().body,
           userName: doc.data().userName,
-          createdAt: doc.data().createdAt
+          createdAt: doc.data().createdAt,
+          commentCount: doc.data().commentCount,
+          likeCount: doc.data().likeCount,
+          userImage: doc.data().userImage,
         });
       })
       return response.json(posts);
@@ -60,7 +63,6 @@ const getPost = (request, response) => {
       .then( data => { 
         postData.comments = []
         data.forEach((doc) => {
-          console.log('doc2push: ', doc)
           postData.comments.push(doc.data());
         })
       return response.json(postData);
@@ -96,7 +98,7 @@ const commentOnPost = (request, response) => {
     return response.json(newComment);
   })
   .catch((error) => {
-    console.log(error);
+    console.error(error);
     response.status(500).json({ error: 'Something went wrong' });
   });
 }

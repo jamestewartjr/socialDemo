@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const app = require('express')();
+const {db} = require('./util/admin');
 
 const {firebaseAuth} = require('./util/firebaseAuth')
 const {
@@ -12,11 +13,13 @@ const {
   unlikePost
 } = require('./handlers/posts')
 const {
+  addUserDetails, 
+  getRegisteredUser,
+  getUserDetails,
   login, 
+  markNotificationsRead,
   signup, 
   uploadImage, 
-  addUserDetails, 
-  getRegisteredUser
 } = require('./handlers/users');
 
 app.get('/posts', getAllPosts);
@@ -27,11 +30,71 @@ app.delete('/post/:postId', firebaseAuth, deletePost);
 app.get('/post/:postId/like', firebaseAuth, likePost);
 app.get('/post/:postId/unlike', firebaseAuth, unlikePost);
 
-
 app.post('/signup', signup);
 app.post('/login', login);
-app.post('/user/image', firebaseAuth, uploadImage)
-app.post('/user/',  firebaseAuth, addUserDetails)
-app.get('/user/',  firebaseAuth, getRegisteredUser)
+app.post('/user/image', firebaseAuth, uploadImage);
+app.post('/user/',  firebaseAuth, addUserDetails);
+app.get('/user/',  firebaseAuth, getRegisteredUser);
+app.get('/user/:userName', getUserDetails);
+app.post('/notifications', firebaseAuth, markNotificationsRead);
 
 exports.api = functions.https.onRequest(app);
+
+exports.sendNotificationOnLike = functions
+  .firestore.document('likes/{id}')
+    .onCreate((snapshot) => {
+    return db.doc(`/posts/${snapshot.data().postId}`).get()
+      .then(doc => {
+        if(doc.exists && doc.data().userName !== snapshot.data().userName){
+          return db.doc(`/notifications/${snapshot.id}`).set({
+            createdAt: new Date().toISOString(),
+            receipient: doc.data().userName,
+            sender: snapshot.data().userName,
+            type: 'like',
+            read: false,
+            postId: doc.id
+          });
+        }
+        return null;
+      })
+      .catch( error => {
+        console.error({ error: error})
+      })
+  })
+
+  exports.deleteNotificationOnUnLike = functions
+  .firestore.document('likes/{id}')
+    .onDelete((snapshot) => {
+    return db
+      .doc(`/notifications/${snapshot.id}`)
+      .delete()
+      .catch((err) => {
+        console.error(err);
+      });
+  });
+
+  exports.sendNotificationOnComment = functions
+  .firestore.document('comments/{id}')
+    .onCreate((snapshot) => {
+    return db
+      .doc(`/posts/${snapshot.data().postId}`)
+      .get()
+      .then((doc) => {
+        if (
+          doc.exists && doc.data().userName !== snapshot.data().userName
+        ) {
+          return db.doc(`/notifications/${snapshot.id}`).set({
+            createdAt: new Date().toISOString(),
+            recipient: doc.data().userName,
+            sender: snapshot.data().userName,
+            type: 'comment',
+            read: false,
+            postId: doc.id
+          });
+        }
+          return null;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
