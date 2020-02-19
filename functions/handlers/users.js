@@ -26,10 +26,7 @@ const login = (request, response) => {
     })
     .catch(error => {
       console.error('Error: ',error);
-      if(error.code === 'auth/wrong-password'){
-        return response.status(403).json({general: 'Wrong credentials.'});
-
-      } else return response.status(500).json({error: error})
+      return response.status(403).json({general: 'Wrong credentials.'});
     })
 };
 
@@ -85,7 +82,7 @@ const signup = (request, response) => {
       if(error.code === 'auth/email-already-in-use'){
         return response.status(400).json({ email: 'Email is already in use.'})
       }else {
-        return response.status(500).json({error: error})
+        return response.status(500).json({error: "Something went wrong."})
       }
     });
 };
