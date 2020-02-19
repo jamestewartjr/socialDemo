@@ -45,7 +45,7 @@ exports.sendNotificationOnLike = functions
     .onCreate((snapshot) => {
     return db.doc(`/posts/${snapshot.data().postId}`).get()
       .then(doc => {
-        if(doc.exists){
+        if(doc.exists && doc.data().userName !== snapshot.data().userName){
           return db.doc(`/notifications/${snapshot.id}`).set({
             createdAt: new Date().toISOString(),
             receipient: doc.data().userName,
