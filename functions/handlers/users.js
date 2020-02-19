@@ -163,12 +163,30 @@ const getRegisteredUser = (request, response) => {
           .where('userName', '==', request.user.userName)
           .get()  
       }
+      return null;
     })
     .then(data => {
       userData.likes = [];
       data.forEach(doc => {
         userData.likes.push(doc.data());
       });
+      return db.collection('notifications')
+        .where('recipient', '==', request.user.userName)
+        .orderBy('createdAt', 'desc').get();
+    })
+    .then( data => {
+      userData.notifications = [];
+      data.forEach( doc => {
+        userData.notifications.push({
+          recipient: doc.data().recipient,
+          sender: doc.data().sender,
+          createdAt: doc.data().createdAt,
+          postId: doc.data().postId,
+          type: doc.data().type,
+          read: doc.data().read,
+          notificationId: doc.id
+        })
+      })
       return response.json(userData);
     })
     .catch(error => {

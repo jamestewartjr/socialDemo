@@ -51,7 +51,7 @@ exports.sendNotificationOnLike = functions.firestore.document('likes/{id}')
             postId: doc.id
           });
         }
-        return;
+        return null;
       })
       .catch( error => {
         console.error({ error: error})
@@ -79,8 +79,7 @@ exports.sendNotificationOnLike = functions.firestore.document('likes/{id}')
       .get()
       .then((doc) => {
         if (
-          doc.exists &&
-          doc.data().userName !== snapshot.data().userName
+          doc.exists && doc.data().userName !== snapshot.data().userName
         ) {
           return db.doc(`/notifications/${snapshot.id}`).set({
             createdAt: new Date().toISOString(),
@@ -91,6 +90,7 @@ exports.sendNotificationOnLike = functions.firestore.document('likes/{id}')
             postId: doc.id
           });
         }
+          return null;
       })
       .catch((err) => {
         console.error(err);
