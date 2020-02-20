@@ -22,7 +22,7 @@ class Home extends Component {
   render() {
     let recentPosts = this.state.posts 
       ? (this.state.posts.map(post => 
-          <Post post={post}/>
+          <Post key={post.postId} post={post}/>
         )) 
       : <p>Loading.... </p>
     return ( 
