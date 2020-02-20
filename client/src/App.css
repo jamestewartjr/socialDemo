@@ -1,0 +1,12 @@
+html,
+body {
+  background-color: gray;
+}
+.container {
+  margin: 80px auto 0 auto;
+  max-width: 1000px;
+}
+
+a{
+  text-decoration: none;
+}
