@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
 import axios from 'axios';
+import Post from '../components/Post'
 
 class Home extends Component {
   state = {
@@ -20,8 +21,8 @@ class Home extends Component {
 
   render() {
     let recentPosts = this.state.posts 
-      ? (this.state.posts.map(posts => 
-          <p>{posts.body}</p>
+      ? (this.state.posts.map(post => 
+          <Post post={post}/>
         )) 
       : <p>Loading.... </p>
     return ( 
