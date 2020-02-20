@@ -8,21 +8,21 @@ class Home extends Component {
     posts: null
   }
   
-  componentDidMount(){
-    axios.get('/posts')
-      .then( response => {
-        console.log(response)
-        this.setState({
-          posts: response.data
-        })
-      })
-      .catch( error => console.error(error))
-  }
+  // componentDidMount(){
+  //   axios.get('/posts')
+  //     .then( response => {
+  //       console.log(response)
+  //       this.setState({
+  //         posts: response.data
+  //       })
+  //     })
+  //     .catch( error => console.error(error))
+  // }
 
   render() {
     let recentPosts = this.state.posts 
       ? (this.state.posts.map(post => 
-          <Post post={post}/>
+          <Post key={post.postId} post={post}/>
         )) 
       : <p>Loading.... </p>
     return ( 
