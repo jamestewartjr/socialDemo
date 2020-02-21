@@ -10,34 +10,12 @@ import axios from 'axios'
 import {Link} from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
-const styles = {
-  form: {
-    textAlign: 'center'
-  },
-  pageTitle: {
-    margin: '10px auto 10px auto'
-  },
-  textField: {
-    margin: '10px auto 10px auto'
-  },
-  button: {
-    marginTop: '20px',
-    position: 'relative'
-  },
-  customerError: {
-    color: 'red',
-    fontSize: '0.8rem',
-    marginTop: '10px'
-  },
-  progress: {
-    position: 'absolute'
-  }
-}
+const styles = (theme) => ({...theme})
 
 class Login extends Component {
   constructor(){
     super();
-    this.state={
+    this.state = {
       email: '',
       password: '',
       loading: false,
@@ -48,6 +26,7 @@ class Login extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     this.setState({loading:true})
+    // localStorage.setItem('SocialDemoFBToken', `Bearer ${response.data.token}`)
     const userData = {
       email: this.state.email,
       password: this.state.password,
