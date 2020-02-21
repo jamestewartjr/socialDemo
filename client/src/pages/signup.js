@@ -10,7 +10,7 @@ import axios from 'axios'
 import {Link} from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
-const styles = (theme) => ({...theme})
+const styles = (theme) => ({...theme.otherStyles})
 
 class Signup extends Component {
   constructor(){
