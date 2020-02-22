@@ -32,7 +32,7 @@ class Login extends Component {
       password: this.state.password,
     }
 
-    axios.post('login', userData)
+    axios.post('http://localhost:3000/login', userData)
       .then( response => {
         console.log(response.data)
         this.setState({loading:false})
@@ -97,6 +97,7 @@ class Login extends Component {
               color="primary" 
               className={classes.button}
               disabled={loading}
+              fullWidth
             > 
               Login
               {loading 

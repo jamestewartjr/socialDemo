@@ -96,7 +96,7 @@ class Signup extends Component {
               id="confirmPassword" 
               name="confirmPassword"
               type="password"
-              label="confirmPassword"
+              label="Confirm Password"
               className={classes.textField}
               helperText={errors.confirmPassword}
               error={errors.confirmPassword ? true : false}
@@ -108,19 +108,23 @@ class Signup extends Component {
               id="userName" 
               name="userName"
               type="text"
-              label="UserName"
+              label="User Name"
               className={classes.textField}
               helperText={errors.userName}
               error={errors.userName ? true : false}
               value={this.state.userName}
               onChange={this.handleChange}
             />
+            <div>
             {errors.general && (
               <Typography variant= "body2" className={classes.customError}>
                 {errors.general}
               </Typography>
             )}
+            </div>
+            
             <Button 
+              fullWidth
               type="submit" 
               variant="contained" 
               color="primary" 
