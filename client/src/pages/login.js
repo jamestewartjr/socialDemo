@@ -1,71 +1,40 @@
 import React, { Component } from 'react'
-import '../App.css'
 import withStyles from '@material-ui/core/styles/withStyles'
 import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField'
 import PropTypes from 'prop-types'
 import Typography  from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
-import axios from 'axios'
 import {Link} from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import {connect} from 'react-redux'
+import {loginUser} from '../redux/actions/userActions'
 
-const styles = {
-  form: {
-    textAlign: 'center'
-  },
-  pageTitle: {
-    margin: '10px auto 10px auto'
-  },
-  textField: {
-    margin: '10px auto 10px auto'
-  },
-  button: {
-    marginTop: '20px',
-    position: 'relative'
-  },
-  customerError: {
-    color: 'red',
-    fontSize: '0.8rem',
-    marginTop: '10px'
-  },
-  progress: {
-    position: 'absolute'
-  }
-}
+const styles = (theme) => ({...theme.otherStyles})
 
 class Login extends Component {
   constructor(){
     super();
-    this.state={
+    this.state = {
       email: '',
       password: '',
-      loading: false,
       errors: {}
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(nextProps.UI.errors){
+      this.setState({errors: nextProps.UI.errors})
     }
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
-    this.setState({loading:true})
     const userData = {
       email: this.state.email,
       password: this.state.password,
     }
-
-    axios.post('login', userData)
-      .then( response => {
-        console.log(response.data)
-        this.setState({loading:false})
-        this.props.history.push('/')
-      })
-      .catch( error => {
-        console.log('login error', error)
-        this.setState({
-          errors: error,
-          loading: false
-        })
-      })
+    this.props.loginUser(userData, this.props.history)
   }
 
   handleChange = (event) => {
@@ -75,8 +44,8 @@ class Login extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-    const { errors, loading} = this.state;
+    const { classes, UI: {loading }} = this.props;
+    const { errors} = this.state;
     return ( 
       <Grid container className={classes.form}>
         <Grid item sm/>
@@ -118,6 +87,7 @@ class Login extends Component {
               color="primary" 
               className={classes.button}
               disabled={loading}
+              fullWidth
             > 
               Login
               {loading 
@@ -131,14 +101,25 @@ class Login extends Component {
           </form>
         </Grid>
         <Grid item sm/>
-
       </Grid>
     )
   }
 }
 
 Login.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  loginUser: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Login);
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+})
+
+const mapActionsToProps = {
+  loginUser
+}
+
+export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Login));

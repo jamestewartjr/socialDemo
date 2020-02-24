@@ -32,9 +32,6 @@ class Post extends Component {
         createdAt,
         userImages, 
         userName,
-        postId, 
-        likeCount, 
-        commentCount
       }
     } = this.props;
     
