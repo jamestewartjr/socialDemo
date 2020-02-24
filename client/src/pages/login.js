@@ -6,9 +6,10 @@ import TextField from '@material-ui/core/TextField'
 import PropTypes from 'prop-types'
 import Typography  from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
-import axios from 'axios'
 import {Link} from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import { connect} from 'react-redux'
+import {loginUser} from '../redux/actions/userActions'
 
 const styles = (theme) => ({...theme.otherStyles})
 
@@ -18,33 +19,23 @@ class Login extends Component {
     this.state = {
       email: '',
       password: '',
-      loading: false,
       errors: {}
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(nextProps.UI.errors){
+      this.setState({errors: nextProps.UI.errors})
     }
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
-    this.setState({loading:true})
-    // localStorage.setItem('SocialDemoFBToken', `Bearer ${response.data.token}`)
     const userData = {
       email: this.state.email,
       password: this.state.password,
     }
-
-    axios.post('http://localhost:3000/login', userData)
-      .then( response => {
-        console.log(response.data)
-        this.setState({loading:false})
-        this.props.history.push('/')
-      })
-      .catch( error => {
-        console.log('login error', error)
-        this.setState({
-          errors: error,
-          loading: false
-        })
-      })
+    this.props.loginUser(userData, this.props.history)
   }
 
   handleChange = (event) => {
@@ -54,8 +45,8 @@ class Login extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-    const { errors, loading} = this.state;
+    const { classes, UI: {loading }} = this.props;
+    const { errors} = this.state;
     return ( 
       <Grid container className={classes.form}>
         <Grid item sm/>
@@ -111,14 +102,25 @@ class Login extends Component {
           </form>
         </Grid>
         <Grid item sm/>
-
       </Grid>
     )
   }
 }
 
 Login.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  loginUser: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Login);
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+})
+
+const mapActionsToProps = {
+  loginUser
+}
+
+export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Login));
