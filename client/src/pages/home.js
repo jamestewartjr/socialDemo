@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
-import axios from 'axios';
+// import axios from 'axios';
 import Post from '../components/Post'
 
 class Home extends Component {

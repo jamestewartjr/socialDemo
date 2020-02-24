@@ -6,9 +6,10 @@ import TextField from '@material-ui/core/TextField'
 import PropTypes from 'prop-types'
 import Typography  from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
-import axios from 'axios'
 import {Link} from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import {connect} from 'react-redux'
+import {signupUser} from '../redux/actions/userActions'
 
 const styles = (theme) => ({...theme.otherStyles})
 
@@ -19,37 +20,27 @@ class Signup extends Component {
       email: '',
       password: '',
       confirmPassword: '',
-      loading: false,
       errors: {},
       userName: ''
+    }
+  }
 
+  componentWillReceiveProps(nextProps){
+    if(nextProps.UI.errors){
+      this.setState({errors: nextProps.UI.errors})
     }
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
     this.setState({loading:true})
-    const userData = {
+    const newUserData = {
       email: this.state.email,
       password: this.state.password,
       confirmPassword: this.state.confirmPassword,
       userName: this.state.userName
     }
-
-    axios.post('/signup', userData)
-      .then( response => {
-        console.log(response.data)
-        localStorage.setItem('SocialDemoFBToken', `Bearer ${response.data.token}`)
-        this.setState({loading:false})
-        this.props.history.push('/')
-      })
-      .catch( error => {
-        console.log('login error', error)
-        this.setState({
-          errors: error,
-          loading: false
-        })
-      })
+    this.props.signupUser(newUserData, this.props.history)
   }
 
   handleChange = (event) => {
@@ -59,8 +50,8 @@ class Signup extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-    const { errors, loading} = this.state;
+    const { classes, UI: {loading} } = this.props;
+    const { errors } = this.state;
     return ( 
       <Grid container className={classes.form}>
         <Grid item sm/>
@@ -115,13 +106,11 @@ class Signup extends Component {
               value={this.state.userName}
               onChange={this.handleChange}
             />
-            <div>
             {errors.general && (
               <Typography variant= "body2" className={classes.customError}>
                 {errors.general}
               </Typography>
             )}
-            </div>
             
             <Button 
               fullWidth
@@ -149,7 +138,15 @@ class Signup extends Component {
 }
 
 Signup.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired,
+  signupUser: PropTypes.func.isRequired
 }
+ 
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+})
 
-export default withStyles(styles)(Signup);
+export default connect(mapStateToProps, {signupUser})(withStyles(styles)(Signup));
